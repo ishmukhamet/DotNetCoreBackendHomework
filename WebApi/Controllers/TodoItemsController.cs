@@ -1,6 +1,7 @@
+using MassTransit;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using WebApi.BusinessLogic.Contracts.AddTodoItem;
 using WebApi.BusinessLogic.Contracts.GetTodoItem;
 using WebApi.BusinessLogic.Contracts.GetTodoItemList;
@@ -14,21 +15,36 @@ namespace WebApi.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly GetTodoItemRequestHandler _getTodoItemRequestHandler;
+        private readonly GetTodoItemListRequestHandler _getTodoItemListRequestHandler;
         private readonly AddTodoItemRequestHandler _addTodoItemRequestHandler;
+        private readonly UpdateTodoItemRequestHandler _updateTodoItemRequestHandler;
+        //private readonly IPublishEndpoint _publishEndpoint;
 
         public TodoItemsController(
             GetTodoItemRequestHandler getTodoItemRequestHandler,
-            AddTodoItemRequestHandler addTodoItemRequestHandler
+            GetTodoItemListRequestHandler getTodoItemListRequestHandler,
+            AddTodoItemRequestHandler addTodoItemRequestHandler,
+            UpdateTodoItemRequestHandler updateTodoItemRequestHandler/*,
+            IPublishEndpoint publishEndpoint*/
         )
         {
             _getTodoItemRequestHandler = getTodoItemRequestHandler;
+            _getTodoItemListRequestHandler = getTodoItemListRequestHandler;
             _addTodoItemRequestHandler = addTodoItemRequestHandler;
+            _updateTodoItemRequestHandler = updateTodoItemRequestHandler;
+            //_publishEndpoint = publishEndpoint;
         }
 
         [HttpGet("{id:guid}")]
         public Task<GetTodoItemResponse> GetTodoItemAsync(Guid id)
         {
             return _getTodoItemRequestHandler.HandleAsync(id);
+        }
+
+        [HttpGet]
+        public Task<GetTodoItemListResponse> GetTodoItemAsync()
+        {
+            return _getTodoItemListRequestHandler.HandleAsync();
         }
 
         [HttpPost]
@@ -38,10 +54,18 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public Task<GetTodoItemResponse> UpdateTodoItemAsync(Guid id, [FromBody] UpdateTodoItemRequest request)
+        public async Task UpdateTodoItemAsync(Guid id, [FromBody] UpdateTodoItemRequest request)
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            //await _publishEndpoint.Publish<UpdateTodoItemMessage>(new
+            //{
+            //    id = id,
+            //    title = request.Title,
+            //    iscompleted = request.IsCompleted
+            //});
+
+            //return Ok();
+
+            _ = _updateTodoItemRequestHandler.HandleAsync(id, request);
         }
     }
 }

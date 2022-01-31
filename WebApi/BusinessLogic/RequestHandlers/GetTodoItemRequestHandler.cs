@@ -21,7 +21,7 @@ namespace WebApi.BusinessLogic.RequestHandlers
 
             if (item == null)
             {
-                throw new BadRequestException("NotFound");
+                throw new NotFoundException("NotFound");
             }
 
             return new GetTodoItemResponse

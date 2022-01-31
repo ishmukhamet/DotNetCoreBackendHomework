@@ -32,6 +32,12 @@ namespace WebApi.Engine
                     errorCode = badRequestException.ErrorCode;
 
                     break;
+                case NotFoundException notFoundException:
+                    statusCode = StatusCodes.Status404NotFound;
+                    userMessage = "Cущность не найдена";
+                    errorCode = notFoundException.ErrorCode;
+
+                    break;
             }
 
             var errorData = new ErrorData(userMessage, errorCode);

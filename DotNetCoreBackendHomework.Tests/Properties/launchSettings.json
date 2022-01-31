@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DotNetCoreBackendHomework.Tests": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

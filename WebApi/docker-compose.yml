@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+    webapi:
+        image: webapi:dev
+        depends_on:
+            - "postgres_image"
+        build:
+            context: ../
+            dockerfile: WebApi/Dockerfile
+        volumes:
+            - ../app:/app
+        ports:
+            - "5000:5000"
+        environment:
+            DB_CONNECTION_STRING: "host=localhost;port=5432;database=homework;username=tester;password=tester;"
+        tty: true
+    postgres_image:
+        image: postgres:14.1
+        environment:
+            POSTGRES_DB: "homework"
+            POSTGRES_USER: "tester"
+            POSTGRES_PASSWORD: "tester"
+        volumes:
+            - ..:/docker-entrypoint-initdb.d
+        ports:
+            - "5432:5432"
