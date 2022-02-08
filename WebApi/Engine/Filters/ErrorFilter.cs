@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using WebApi.BusinessLogic.Contracts.Exceptions;
 
-namespace WebApi.Engine
+namespace WebApi.Engine.Filters
 {
     public class ErrorFilter : ExceptionFilterAttribute
     {
@@ -30,7 +30,11 @@ namespace WebApi.Engine
                     statusCode = StatusCodes.Status400BadRequest;
                     userMessage = $"Некорректный запрос, код ошибки {badRequestException.ErrorCode}";
                     errorCode = badRequestException.ErrorCode;
-
+                    break;
+                case NotFoundException notFoundException:
+                    statusCode = StatusCodes.Status404NotFound;
+                    userMessage = $"Задача не существует";
+                    errorCode = notFoundException.ErrorCode;
                     break;
             }
 

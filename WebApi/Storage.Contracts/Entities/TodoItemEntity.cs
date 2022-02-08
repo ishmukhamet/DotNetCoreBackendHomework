@@ -6,6 +6,6 @@ namespace WebApi.Storage.Contracts.Entities
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = null!;
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted { get; set; } = false;
     }
 }

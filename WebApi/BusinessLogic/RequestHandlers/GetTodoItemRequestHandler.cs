@@ -1,3 +1,4 @@
+using AutoMapper;
 using System;
 using System.Threading.Tasks;
 using WebApi.BusinessLogic.Contracts.Exceptions;
@@ -9,10 +10,12 @@ namespace WebApi.BusinessLogic.RequestHandlers
     public class GetTodoItemRequestHandler
     {
         private readonly ITodoItemRepository _todoItemRepository;
+        private readonly IMapper _mapper;
 
-        public GetTodoItemRequestHandler(ITodoItemRepository todoItemRepository)
+        public GetTodoItemRequestHandler(ITodoItemRepository todoItemRepository, IMapper mapper)
         {
             _todoItemRepository = todoItemRepository;
+            _mapper = mapper;
         }
 
         public async Task<GetTodoItemResponse> HandleAsync(Guid id)
@@ -21,15 +24,9 @@ namespace WebApi.BusinessLogic.RequestHandlers
 
             if (item == null)
             {
-                throw new BadRequestException("NotFound");
+                throw new NotFoundException("NotFound");
             }
-
-            return new GetTodoItemResponse
-            {
-                Id = item.Id,
-                Title = item.Title,
-                IsCompleted = item.IsCompleted
-            };
+            return _mapper.Map<GetTodoItemResponse>(item);
         }
     }
 }

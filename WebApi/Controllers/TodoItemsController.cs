@@ -14,15 +14,26 @@ namespace WebApi.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly GetTodoItemRequestHandler _getTodoItemRequestHandler;
+        private readonly GetTodoItemListRequestHandler _getTodoItemListRequestHandler;
         private readonly AddTodoItemRequestHandler _addTodoItemRequestHandler;
+        private readonly UpdateTodoItemRequestHandler _updateTodoItemRequestHandler;
 
         public TodoItemsController(
             GetTodoItemRequestHandler getTodoItemRequestHandler,
-            AddTodoItemRequestHandler addTodoItemRequestHandler
-        )
+            GetTodoItemListRequestHandler getTodoItemListRequestHandler,
+            AddTodoItemRequestHandler addTodoItemRequestHandler,
+            UpdateTodoItemRequestHandler updateTodoItemRequestHandler)
         {
             _getTodoItemRequestHandler = getTodoItemRequestHandler;
+            _getTodoItemListRequestHandler = getTodoItemListRequestHandler;
             _addTodoItemRequestHandler = addTodoItemRequestHandler;
+            _updateTodoItemRequestHandler = updateTodoItemRequestHandler;
+        }
+
+        [HttpGet()]
+        public Task<GetTodoItemListResponse> GetTodoItemsAsync()
+        {
+            return _getTodoItemListRequestHandler.HandleAsync();
         }
 
         [HttpGet("{id:guid}")]
@@ -38,10 +49,9 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public Task<GetTodoItemResponse> UpdateTodoItemAsync(Guid id, [FromBody] UpdateTodoItemRequest request)
+        public Task UpdateTodoItemAsync(Guid id, [FromBody] UpdateTodoItemRequest request)
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            return _updateTodoItemRequestHandler.HandleAsync(id, request);
         }
     }
 }
