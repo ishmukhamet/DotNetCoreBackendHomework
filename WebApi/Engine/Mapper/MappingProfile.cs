@@ -3,6 +3,7 @@ using WebApi.BusinessLogic.Contracts.AddTodoItem;
 using WebApi.BusinessLogic.Contracts.GetTodoItem;
 using WebApi.BusinessLogic.Contracts.GetTodoItemList;
 using WebApi.BusinessLogic.Contracts.UpdateTodoItem;
+using WebApi.Queue.Contracts;
 using WebApi.Storage.Contracts.Entities;
 
 namespace WebApi.Engine.Mapper
@@ -22,6 +23,12 @@ namespace WebApi.Engine.Mapper
 
             CreateMap<GetTodoItemResponse, TodoItemEntity>();
             CreateMap<TodoItemEntity, GetTodoItemResponse>();
+
+            CreateMap<UpdateTodoItemMessage, UpdateTodoItemRequest>();
+            CreateMap<UpdateTodoItemRequest, UpdateTodoItemMessage>();
+
+            CreateMap<UpdateTodoItemMessage, TodoItemEntity>();
+            CreateMap<TodoItemEntity, UpdateTodoItemMessage>();
         }
     }
 }
