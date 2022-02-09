@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.BusinessLogic.Contracts.AddTodoItem;
 using WebApi.BusinessLogic.Contracts.GetTodoItem;
@@ -11,6 +12,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("todoItems")]
+    [Authorize]
     public class TodoItemsController : ControllerBase
     {
         private readonly GetTodoItemRequestHandler _getTodoItemRequestHandler;

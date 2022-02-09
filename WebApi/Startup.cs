@@ -16,6 +16,9 @@ using WebApi.Queue;
 using WebApi.HostedServices;
 using System;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace WebApi
 {
@@ -78,7 +81,43 @@ namespace WebApi
             services.AddMassTransitHostedService(true);
 
             services.AddControllers();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" }); });
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = "todo-api";
+                    options.Authority = "http://host.docker.internal:5003";
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new
+                    TokenValidationParameters()
+                    {
+                        ValidateAudience = false,
+                        ValidateIssuer = false,
+                    };
+                });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
+                c.OperationFilter<SwaggerAuthenticationRequirementsOperationFilter>();
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    BearerFormat = "JWT",
+                    OpenIdConnectUrl = new Uri("http://localhost:5003/.well-known/openid-configuration"),
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        ClientCredentials = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri("http://localhost:5003/connect/authorize"),
+                            TokenUrl = new Uri("http://localhost:5003/connect/token"),
+                            Scopes = new Dictionary<string, string>
+                            {
+                                {"todo-api", "Demo API - full access"}
+                            }
+                        },
+                    }
+                });
+                ;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,12 +127,40 @@ namespace WebApi
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1");
+                    c.OAuthClientId("client");
+                    c.OAuthAppName("Todo API - Swagger");
+                    c.OAuthUsePkce();
+                });
             }
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
+
+    public class SwaggerAuthenticationRequirementsOperationFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            if (operation.Security == null)
+            {
+                operation.Security = new List<OpenApiSecurityRequirement>();
+            }
+
+            var scheme = new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" } };
+
+            operation.Security.Add(new OpenApiSecurityRequirement
+            {
+                [scheme] = new List<string>()
+            });
+        }
+    }
+
 }

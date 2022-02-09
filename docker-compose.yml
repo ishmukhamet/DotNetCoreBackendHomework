@@ -9,6 +9,19 @@ services:
     ports:
       - "5000:80"
       - "5001:443"
+    networks:
+      - shared-network
+
+  identityserver:
+    image: ${DOCKER_REGISTRY-}identityserver
+    build:
+      context: .
+      dockerfile: IdentityServer/Dockerfile
+    ports:
+      - "5003:80"
+      - "5002:443"
+    networks:
+      - shared-network
 
   postgres:
     container_name: postgres_container
@@ -21,7 +34,6 @@ services:
     volumes:
       - .:/var/lib/postgresql/data
       - ./WebApi/DB.Scripts:/docker-entrypoint-initdb.d
-
     ports:
       - "5432:5432"
     deploy:
@@ -30,7 +42,7 @@ services:
           cpus: '1'
           memory: 4G
     networks:
-      - postgres
+      - shared-network
   rabbitmq:
     container_name: rabbitmq_container
     image: masstransit/rabbitmq
@@ -39,5 +51,5 @@ services:
       - "5672:5672"
     
 networks:
-  postgres:
+  shared-network:
     driver: bridge
