@@ -26,7 +26,7 @@ namespace WebApi.BusinessLogic.RequestHandlers
         {
             var message = _mapper.Map<UpdateTodoItemMessage>(request);
             message.Id = id;
-            return _bus.Publish<UpdateTodoItemMessage>(message);
+            return _bus.Publish(message);
         }
     }
 }
