@@ -1,15 +1,28 @@
+using MassTransit;
 using System;
 using System.Threading.Tasks;
 using WebApi.BusinessLogic.Contracts.UpdateTodoItem;
+using WebApi.Queue.Contracts;
 
 namespace WebApi.BusinessLogic.RequestHandlers
 {
     public class UpdateTodoItemRequestHandler
     {
-        public Task HandleAsync(Guid id, UpdateTodoItemRequest request)
+        private readonly IBus _bus;
+
+        public UpdateTodoItemRequestHandler(IBus bus)
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            _bus = bus;
+        }
+
+        public async Task HandleAsync(Guid id, UpdateTodoItemRequest request)
+        {
+            await _bus.Publish(new UpdateTodoItemMessage
+            {
+                Id = id,
+                IsCompleted = request.IsCompleted,
+                Title = request.Title
+            });
         }
     }
 }

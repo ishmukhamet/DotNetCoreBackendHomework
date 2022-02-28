@@ -1,12 +1,9 @@
-using System;
-using System.Threading.Tasks;
 using WebApi.Storage.Contracts.Entities;
+using WebApi.Storage.Contracts.SeedWork;
 
 namespace WebApi.Storage.Contracts.Repositories
 {
-    public interface ITodoItemRepository
+    public interface ITodoItemRepository : IGuidRepository<TodoItemEntity>
     {
-        Task<TodoItemEntity?> GetAsync(Guid id);
-        Task AddOrUpdateAsync(TodoItemEntity entity);
     }
 }
